@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Brython Tk-like Window</title>
+        <link rel="stylesheet" href="https://unpkg.com/7.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.2/brython.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.2/brython_stdlib.js"></script>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                overflow: hidden;
+            }
+            body {
+                background-image: url('https://ia804603.us.archive.org/10/items/Windows-wallcollection/1920x1200_%28Windows_7%29.jpg');
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+            }
+            .window {
+                position: absolute;
+                top: 50px;
+                left: 50px;
+                min-width: 400px;
+                min-height: 300px;
+                display: flex;
+                flex-direction: column;
+            }
+            #myWindow2 {
+                top: 0;
+                left: 0;
+            }
+            .title-bar {
+                user-select: none;
+            }
+            .title-bar.dragging {
+                cursor: grabbing;
+            }
+            * {
+                cursor: url('/arrow/windows7_arrow.cur'), default;
+            }
+            a {
+                cursor: url('/arrow/windows7_link.cur'), pointer;
+            }
+            input, textarea {
+                cursor: url('/arrow/windows7_text.cur'), text;
+            }
+            canvas {
+                cursor: url('/arrow/windows7_pen.cur'), default;
+            }
+            menu[role="tablist"] {
+                /*margin-left: 6px;*/
+            }
+        </style>
+    </head>
+    <body onload="brython()">
+        <div id="myWindow" class="window active">
+            <div class="title-bar">
+                <div class="title-bar-text">tk</div>
+                <div class="title-bar-controls">
+                    <button id="minimizeButton" aria-label="Minimize"></button>
+                    <button id="closeButton" aria-label="Close"></button>
+                </div>
+            </div>
+            <!-- The menubar will now be added directly to the window-body -->
+            <div class="window-body has-space" style="flex-grow: 1;">
+            </div>
+        </div>
+        <!--
+        <div id="myWindow2" class="window active">
+            <div class="title-bar">
+                <div class="title-bar-text">Open</div>
+                <div class="title-bar-controls">
+                    <button id="closeButton" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body has-space">
+                <div class="table-container">
+                    <table class="has-shadow">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Modified</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>test.txt</td>
+                                <td>3/29/2017 12:00 AM</td>
+                                <td>432 B</td>
+                            </tr>
+                            <tr>
+                                <td>program.exe</td>
+                                <td>3/29/2017 12:00 AM</td>
+                                <td>1 KB</td>
+                            </tr>
+                            <tr>
+                                <td>data.log</td>
+                                <td>4/1/2017 01:00 PM</td>
+                                <td>2 KB</td>
+                            </tr>
+                            <tr>
+                                <td>image.jpg</td>
+                                <td>4/2/2017 02:30 PM</td>
+                                <td>500 KB</td>
+                            </tr>
+                            <tr><td>file_01.dat</td><td>4/3/2017 03:00 PM</td><td>12 KB</td></tr>
+                            <tr><td>file_02.dat</td><td>4/4/2017 04:00 PM</td><td>15 KB</td></tr>
+                            <tr><td>file_03.dat</td><td>4/5/2017 05:00 PM</td><td>20 KB</td></tr>
+                            <tr><td>file_04.dat</td><td>4/6/2017 06:00 PM</td><td>32 KB</td></tr>
+                            <tr><td>file_05.dat</td><td>4/7/2017 07:00 PM</td><td>18 KB</td></tr>
+                            <tr><td>file_06.dat</td><td>4/8/2017 08:00 PM</td><td>25 KB</td></tr>
+                            <tr><td>file_07.dat</td><td>4/9/2017 09:00 PM</td><td>40 KB</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="button-section">
+                    <button onclick="handleOpen()">Open</button>
+                    <button onclick="handleCancel()">Cancel</button>
+                </div>
+            </div>
+        </div> -->
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const windowElement = document.getElementById('myWindow');
+                const titleBar = windowElement.querySelector('.title-bar');
+
+                let isDragging = false;
+                let offsetX, offsetY;
+
+                function handleDrag(e) {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    const newX = e.clientX - offsetX;
+                    const newY = e.clientY - offsetY;
+                    windowElement.style.left = `${newX}px`;
+                    windowElement.style.top = `${newY}px`;
+                }
+
+                function stopAction() {
+                    isDragging = false;
+                    windowElement.classList.remove('dragging');
+                    document.removeEventListener('mousemove', handleDrag);
+                    document.removeEventListener('mouseup', stopAction);
+                }
+
+                // Dragging functionality
+                titleBar.addEventListener('mousedown', (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    isDragging = true;
+                    windowElement.classList.add('dragging');
+                    offsetX = e.clientX - windowElement.offsetLeft;
+                    offsetY = e.clientY - windowElement.offsetTop;
+                    document.addEventListener('mousemove', handleDrag);
+                    document.addEventListener('mouseup', stopAction);
+                });
+            });
+        </script>
+        <script type="text/python" src="main.py"></script>
+    </body>
+</html>
